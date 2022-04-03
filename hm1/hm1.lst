@@ -1,0 +1,177 @@
+     1                                      section .data ; сегмент инициализированных переменных
+     2 00000000 746869732069732073-     text db "this is some beautiful amazing text which length is ten", 10
+     2 00000009 6F6D65206265617574-
+     2 00000012 6966756C20616D617A-
+     2 0000001B 696E67207465787420-
+     2 00000024 7768696368206C656E-
+     2 0000002D 677468206973207465-
+     2 00000036 6E0A               
+     3                                  lenText equ $-text
+     4                                  
+     5 00000038 5175616E7469747920-     mesGood db "Quantity of works with size more than 4 symbols: "
+     5 00000041 6F6620776F726B7320-
+     5 0000004A 776974682073697A65-
+     5 00000053 206D6F726520746861-
+     5 0000005C 6E20342073796D626F-
+     5 00000065 6C733A20           
+     6                                  lenMesGood equ $-mesGood
+     7                                  
+     8 00000069 20                      space db " "
+     9                                  
+    10                                  
+    11                                      section .bss ; сегмент неинициализированных переменных
+    12 00000000 <res 0000000A>          OutBuf resb 10
+    13 0000000A <res 00000002>          lastSpace resw 1
+    14 0000000C <res 00000002>          cnt resw 1
+    15                                  
+    16                                      section .text
+    17                                      global  _start
+    18                                  _start:
+    19 00000000 66BA0000                    mov dx, 0
+    20 00000004 668915[0A000000]            mov [lastSpace], dx
+    21 0000000B 66BA0000                    mov dx, 0
+    22 0000000F 668915[0C000000]            mov [cnt], dx
+    23                                  
+    24 00000016 B938000000                  mov ecx, lenText
+    25 0000001B BB00000000                  mov ebx, 0
+    26                                  
+    27                                  
+    28                                  cycle:
+    29 00000020 51                          push ecx
+    30                                  
+    31 00000021 8DB3[00000000]              lea esi, [text + ebx]
+    32 00000027 8D3D[69000000]              lea edi, [space]
+    33 0000002D 43                          inc ebx
+    34                                  
+    35 0000002E A6                          cmpsb
+    36                                  
+    37 0000002F 752D                        jne notEqSym
+    38                                  
+    39 00000031 668B15[0A000000]            mov dx, [lastSpace]
+    40 00000038 66891D[0A000000]            mov [lastSpace], bx
+    41 0000003F 6689D8                      mov ax, bx
+    42 00000042 6648                        dec ax
+    43 00000044 6629D0                      sub ax, dx ; eax have lenght of word
+    44 00000047 66BA0400                    mov dx, 4
+    45                                  
+    46 0000004B 6639D0                      cmp ax, dx
+    47 0000004E 7E0E                        jle lessThanFour
+    48                                      
+    49 00000050 66A1[0C000000]              mov ax, [cnt]
+    50 00000056 6640                        inc ax
+    51 00000058 66A3[0C000000]              mov [cnt], ax
+    52                                  
+    53                                  lessThanFour:
+    54                                  
+    55                                  
+    56                                  notEqSym: 
+    57 0000005E 59                          pop ecx
+    58 0000005F E2BF                        loop cycle
+    59                                      
+    60                                  
+    61                                  ;write message
+    62                                  printAns:
+    63 00000061 B804000000                  mov eax, 4
+    64 00000066 BB01000000                  mov ebx, 1
+    65 0000006B B9[38000000]                mov ecx, mesGood 
+    66 00000070 BA31000000                  mov edx, lenMesGood
+    67 00000075 CD80                        int 80h
+    68                                  
+    69 00000077 BE[00000000]                mov esi, OutBuf
+    70 0000007C 66A1[0C000000]              mov ax, [cnt]
+    71 00000082 98                          cwde
+    72 00000083 E8(55000000)                call IntToStr
+    73                                  
+    74                                      ;print output 
+    75 00000088 89F1                        mov ecx, esi
+    76 0000008A 89C2                        mov edx, eax
+    77 0000008C B804000000                  mov eax, 4
+    78 00000091 BB01000000                  mov ebx, 1
+    79 00000096 CD80                        int 80h
+    80                                  
+    81 00000098 EB00                        jmp exit
+    82                                  
+    83                                  
+    84                                  exit:
+    85                                      ; exit
+    86 0000009A B801000000                  mov eax, 1
+    87 0000009F 31DB                        xor ebx, ebx
+    88 000000A1 CD80                        int 80h
+    89                                  %include "../int_string.asm"
+     1                              <1>     section _text
+     2                              <1> StrToInt:
+     3 00000000 57                  <1>     push   edi
+     4 00000001 B739                <1>     mov    bh, '9'
+     5 00000003 B330                <1>     mov    bl, '0'
+     6 00000005 56                  <1>     push   esi     ;
+     7 00000006 803E2D              <1>     cmp    byte[esi], '-'
+     8 00000009 7501                <1>     jne   .prod
+     9 0000000B 46                  <1>     inc    esi     ;
+    10 0000000C FC                  <1> .prod cld
+    11 0000000D 6631FF              <1>     xor    di, di  ; 
+    12 00000010 AC                  <1> .cycle: lodsb          ; ��������� ������ (�����)
+    13 00000011 3C0A                <1>     cmp    al, 10  ; ���� 10, �� �� �����
+    14 00000013 741F                <1>     je     .Return
+    15 00000015 38D8                <1>     cmp    al, bl  ; ���������� � ����� ����
+    16 00000017 722F                <1>     jb     .Error  ; "����" � ������
+    17 00000019 38F8                <1>     cmp    al, bh  ; ���������� � ����� ������ 
+    18 0000001B 772B                <1>     ja     .Error  ; "����" � ������
+    19 0000001D 2C30                <1>     sub    al, 30h ; �������� ����� �� �������
+    20 0000001F 6698                <1>     cbw            ; ��������� �� �����
+    21 00000021 6650                <1>     push   ax      ; ��������� � �����
+    22 00000023 66B80A00            <1>     mov    ax, 10  ; ������� 10 � AX
+    23 00000027 66F7E7              <1>     mul    di      ; ��������, ��������� � DX:AX
+    24 0000002A 665F                <1>     pop    di      ; � DI � ��������� �����
+    25 0000002C 6601F8              <1>     add    ax, di
+    26 0000002F 6689C7              <1>     mov    di, ax  ; � DI � ����������� �����        
+    27 00000032 EBDC                <1>     jmp    .cycle
+    28 00000034 5E                  <1> .Return: pop    esi
+    29 00000035 BB00000000          <1>     mov    ebx, 0
+    30 0000003A 803E2D              <1>     cmp    byte[esi], '-'
+    31 0000003D 7503                <1>     jne    .J
+    32 0000003F 66F7DF              <1>     neg    di
+    33 00000042 6689F8              <1> .J  mov    ax, di
+    34 00000045 98                  <1>     cwde
+    35 00000046 EB0B                <1>     jmp    .R
+    36 00000048 5E                  <1> .Error: pop    esi
+    37 00000049 B800000000          <1>     mov    eax, 0
+    38 0000004E BB01000000          <1>     mov    ebx, 1
+    39 00000053 5F                  <1> .R       pop    edi
+    40 00000054 C3                  <1>     ret
+    41                              <1> IntToStr: 
+    42 00000055 57                  <1>     push   edi
+    43 00000056 53                  <1>     push   ebx
+    44 00000057 52                  <1>     push   edx
+    45 00000058 51                  <1>     push   ecx
+    46 00000059 56                  <1>     push   esi
+    47 0000005A C60600              <1>     mov    byte[esi],0 ; �� ����� �����
+    48 0000005D 83F800              <1>     cmp    eax,0
+    49 00000060 7D05                <1>     jge    .l1
+    50 00000062 F7D8                <1>     neg    eax
+    51 00000064 C6062D              <1>     mov    byte[esi],'-'
+    52 00000067 C646060A            <1> .l1 mov    byte[esi+6],10
+    53 0000006B BF05000000          <1>     mov    edi,5
+    54 00000070 66BB0A00            <1>     mov    bx,10
+    55 00000074 6699                <1> .again: cwd           ; ��������� ����� �� ��������
+    56 00000076 66F7F3              <1>     div    bx     ; ����� ��������� �� 10
+    57 00000079 80C230              <1>     add    dl,30h ; �������� �� ������� ��� �����
+    58 0000007C 88143E              <1>     mov    [esi+edi],dl ; ����� ������ � ������
+    59 0000007F 4F                  <1>     dec    edi    ; ��������� ��������� ��  
+    60                              <1>                 ; ���������� �������
+    61 00000080 6683F800            <1>     cmp    ax, 0  ; ������������� ��� �����?
+    62 00000084 75EE                <1>     jne    .again
+    63 00000086 B906000000          <1>     mov    ecx, 6
+    64 0000008B 29F9                <1>     sub    ecx, edi ; ����� ����������+����
+    65 0000008D 89C8                <1>     mov    eax,ecx
+    66 0000008F 40                  <1>     inc    eax      ; ����� ����������+0�
+    67 00000090 46                  <1>     inc    esi      ; ���������� ����
+    68 00000091 56                  <1>     push   esi
+    69 00000092 8D343E              <1>     lea    esi,[esi+edi] ; ������ ����������
+    70 00000095 5F                  <1>     pop    edi
+    71 00000096 F3A4                <1>     rep movsb
+    72 00000098 5E                  <1>     pop    esi  
+    73 00000099 59                  <1>     pop    ecx
+    74 0000009A 5A                  <1>     pop    edx
+    75 0000009B 5B                  <1>     pop    ebx
+    76 0000009C 5F                  <1>     pop    edi
+    77 0000009D C3                  <1>     ret
