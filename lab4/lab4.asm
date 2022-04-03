@@ -77,11 +77,11 @@ skipAdding:
     pop ecx
     cmp eax, [bestQuantity]
     jle skipUpdateMax
-    mov dx, 5
-    sub dx, cx
+    mov edx, 7
+    sub edx, ecx
     ; dx have index of optimal
     mov [bestQuantity], eax
-    mov [numberOfBest], dx
+    mov [numberOfBest], edx
 
 skipUpdateMax:
     loop loop_i
@@ -137,6 +137,7 @@ printNumberOfBestString:
     int 80h
     
     jmp printSumOfBestString
+
 
 printSumOfBestString:
 

@@ -57,7 +57,7 @@
     46 00000038 BE[00000000]                mov esi, InBuf
     47 0000003D E8(00000000)                call StrToInt
     48 00000042 83FB00                      cmp ebx, 0
-    49 00000045 0F8502010000                jne errorMessage
+    49 00000045 0F8501010000                jne errorMessage
     50 0000004B 5B                          pop ebx
     51 0000004C 668983[14000000]            mov [matr + ebx], ax
     52 00000053 59                          pop ecx
@@ -87,108 +87,109 @@
     76                                  
     77 00000086 59                          pop ecx
     78 00000087 3B05[44000000]              cmp eax, [bestQuantity]
-    79 0000008D 7E13                        jle skipUpdateMax
-    80 0000008F 66BA0500                    mov dx, 5
-    81 00000093 6629CA                      sub dx, cx
+    79 0000008D 7E12                        jle skipUpdateMax
+    80 0000008F BA07000000                  mov edx, 7
+    81 00000094 29CA                        sub edx, ecx
     82                                      ; dx have index of optimal
     83 00000096 A3[44000000]                mov [bestQuantity], eax
-    84 0000009B 668915[46000000]            mov [numberOfBest], dx
+    84 0000009B 8915[46000000]              mov [numberOfBest], edx
     85                                  
     86                                  skipUpdateMax:
-    87 000000A2 E2BF                        loop loop_i
+    87 000000A1 E2C0                        loop loop_i
     88                                  
-    89 000000A4 EB35                        jmp printNumberOfBestString
+    89 000000A3 EB35                        jmp printNumberOfBestString
     90                                  
     91                                  
     92                                  printMatrix:
-    93 000000A6 B918000000                  mov ecx, 24
-    94 000000AB BB00000000                  mov ebx, 0
+    93 000000A5 B918000000                  mov ecx, 24
+    94 000000AA BB00000000                  mov ebx, 0
     95                                  cycle_write:
-    96 000000B0 51                          push ecx
+    96 000000AF 51                          push ecx
     97                                      ;convert elem of matr to string
-    98 000000B1 BE[0A000000]                mov esi, OutBuf
-    99 000000B6 668B83[14000000]            mov ax, [matr + ebx]
-   100 000000BD 83C302                      add ebx, 2
-   101 000000C0 53                          push ebx
-   102 000000C1 98                          cwde
-   103 000000C2 E8(55000000)                call IntToStr
+    98 000000B0 BE[0A000000]                mov esi, OutBuf
+    99 000000B5 668B83[14000000]            mov ax, [matr + ebx]
+   100 000000BC 83C302                      add ebx, 2
+   101 000000BF 53                          push ebx
+   102 000000C0 98                          cwde
+   103 000000C1 E8(55000000)                call IntToStr
    104                                  
    105                                      ;print output 
-   106 000000C7 89F1                        mov ecx, esi
-   107 000000C9 89C2                        mov edx, eax
-   108 000000CB B804000000                  mov eax, 4
-   109 000000D0 BB01000000                  mov ebx, 1
-   110 000000D5 CD80                        int 80h
+   106 000000C6 89F1                        mov ecx, esi
+   107 000000C8 89C2                        mov edx, eax
+   108 000000CA B804000000                  mov eax, 4
+   109 000000CF BB01000000                  mov ebx, 1
+   110 000000D4 CD80                        int 80h
    111                                      
-   112 000000D7 5B                          pop ebx
-   113 000000D8 59                          pop ecx
-   114 000000D9 E2D5                        loop cycle_write
+   112 000000D6 5B                          pop ebx
+   113 000000D7 59                          pop ecx
+   114 000000D8 E2D5                        loop cycle_write
    115                                      
    116                                  
    117                                  printNumberOfBestString:
    118                                  
    119                                      ;write message
-   120 000000DB B804000000                  mov eax, 4
-   121 000000E0 BB01000000                  mov ebx, 1
-   122 000000E5 B9[13000000]                mov ecx, outMes 
-   123 000000EA BA35000000                  mov edx, lenOutMes
-   124 000000EF CD80                        int 80h
+   120 000000DA B804000000                  mov eax, 4
+   121 000000DF BB01000000                  mov ebx, 1
+   122 000000E4 B9[13000000]                mov ecx, outMes 
+   123 000000E9 BA35000000                  mov edx, lenOutMes
+   124 000000EE CD80                        int 80h
    125                                  
    126                                      ;convert elem of matr to string
-   127 000000F1 BE[0A000000]                mov esi, OutBuf
-   128 000000F6 66A1[46000000]              mov ax, [numberOfBest]
-   129 000000FC 98                          cwde
-   130 000000FD E8(55000000)                call IntToStr
+   127 000000F0 BE[0A000000]                mov esi, OutBuf
+   128 000000F5 66A1[46000000]              mov ax, [numberOfBest]
+   129 000000FB 98                          cwde
+   130 000000FC E8(55000000)                call IntToStr
    131                                  
    132                                      ;print output 
-   133 00000102 89F1                        mov ecx, esi
-   134 00000104 89C2                        mov edx, eax
-   135 00000106 B804000000                  mov eax, 4
-   136 0000010B BB01000000                  mov ebx, 1
-   137 00000110 CD80                        int 80h
+   133 00000101 89F1                        mov ecx, esi
+   134 00000103 89C2                        mov edx, eax
+   135 00000105 B804000000                  mov eax, 4
+   136 0000010A BB01000000                  mov ebx, 1
+   137 0000010F CD80                        int 80h
    138                                      
-   139 00000112 EB00                        jmp printSumOfBestString
+   139 00000111 EB00                        jmp printSumOfBestString
    140                                  
-   141                                  printSumOfBestString:
-   142                                  
-   143                                      ;write message
-   144 00000114 B804000000                  mov eax, 4
-   145 00000119 BB01000000                  mov ebx, 1
-   146 0000011E B9[48000000]                mov ecx, outMesSum
-   147 00000123 BA19000000                  mov edx, lenOutMesSum
-   148 00000128 CD80                        int 80h
-   149                                  
-   150                                      ;convert elem of matr to string
-   151 0000012A BE[0A000000]                mov esi, OutBuf
-   152 0000012F 66A1[44000000]              mov ax, [bestQuantity]
-   153 00000135 98                          cwde
-   154 00000136 E8(55000000)                call IntToStr
-   155                                  
-   156                                      ;print output 
-   157 0000013B 89F1                        mov ecx, esi
-   158 0000013D 89C2                        mov edx, eax
-   159 0000013F B804000000                  mov eax, 4
-   160 00000144 BB01000000                  mov ebx, 1
-   161 00000149 CD80                        int 80h
-   162                                      
-   163 0000014B EB18                        jmp exit
-   164                                  
+   141                                  
+   142                                  printSumOfBestString:
+   143                                  
+   144                                      ;write message
+   145 00000113 B804000000                  mov eax, 4
+   146 00000118 BB01000000                  mov ebx, 1
+   147 0000011D B9[48000000]                mov ecx, outMesSum
+   148 00000122 BA19000000                  mov edx, lenOutMesSum
+   149 00000127 CD80                        int 80h
+   150                                  
+   151                                      ;convert elem of matr to string
+   152 00000129 BE[0A000000]                mov esi, OutBuf
+   153 0000012E 66A1[44000000]              mov ax, [bestQuantity]
+   154 00000134 98                          cwde
+   155 00000135 E8(55000000)                call IntToStr
+   156                                  
+   157                                      ;print output 
+   158 0000013A 89F1                        mov ecx, esi
+   159 0000013C 89C2                        mov edx, eax
+   160 0000013E B804000000                  mov eax, 4
+   161 00000143 BB01000000                  mov ebx, 1
+   162 00000148 CD80                        int 80h
+   163                                      
+   164 0000014A EB18                        jmp exit
    165                                  
-   166                                  errorMessage:
-   167 0000014D B804000000                  mov eax, 4
-   168 00000152 BB01000000                  mov ebx, 1
-   169 00000157 B9[61000000]                mov ecx, errorGetElem
-   170 0000015C BA1A000000                  mov edx, lenErrorGetElem
-   171 00000161 CD80                        int 80h
-   172 00000163 EB00                        jmp exit
-   173                                  
-   174                                  exit:
-   175                                      ; exit
-   176 00000165 B801000000                  mov eax, 1
-   177 0000016A 31DB                        xor ebx, ebx
-   178 0000016C CD80                        int 80h
-   179                                  
-   180                                  %include "../int_string.asm"
+   166                                  
+   167                                  errorMessage:
+   168 0000014C B804000000                  mov eax, 4
+   169 00000151 BB01000000                  mov ebx, 1
+   170 00000156 B9[61000000]                mov ecx, errorGetElem
+   171 0000015B BA1A000000                  mov edx, lenErrorGetElem
+   172 00000160 CD80                        int 80h
+   173 00000162 EB00                        jmp exit
+   174                                  
+   175                                  exit:
+   176                                      ; exit
+   177 00000164 B801000000                  mov eax, 1
+   178 00000169 31DB                        xor ebx, ebx
+   179 0000016B CD80                        int 80h
+   180                                  
+   181                                  %include "../int_string.asm"
      1                              <1>     section _text
      2                              <1> StrToInt:
      3 00000000 57                  <1>     push   edi

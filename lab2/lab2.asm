@@ -1,12 +1,13 @@
     section .data ; сегмент инициализированных переменных 
-a dw 2
+ExitMsg db "Zero division",10
+a dw 0
 b dw 1
-x dw 2
-y dw 1
+x dw 1
+y dw 2
 term1 dw 0
 term2 dw 0
 term3 dw 0
-;lenExit equ $-ExitMsg
+lenExit equ $-ExitMsg
 
     section .bss ; сегмент неинициализированных переменных
 
@@ -31,7 +32,9 @@ _start:
     mov cx, [a]
     imul bx
     ;mov dx, 0
-    cwd
+    cwd ;обнуляем dx
+    cmp cx, 0 ; проверка деления на ноль
+    je ZeroDiv
     idiv cx
     mov [term2], ax
 
@@ -64,7 +67,16 @@ _start:
     mov eax, 4
     mov ebx, 1
     int 80h
+    jmp Exit
 
+ZeroDiv:
+    mov     eax, 4
+    mov     ebx, 1
+    mov     ecx, ExitMsg
+    mov     edx, lenExit
+    int     80h
+
+Exit
     ; exit
     mov eax, 1
     xor ebx, ebx
