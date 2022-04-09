@@ -11,6 +11,9 @@ lenOutMesSum equ $-outMesSum
 errorGetElem db "error while getting input", 10
 lenErrorGetElem equ $-errorGetElem
 
+putEnter db " ", 10
+lenEnter equ $-putEnter
+
     section .bss ; сегмент неинициализированных переменных
 
 InBuf resb 10 ; буфер для вводимой строки
@@ -19,10 +22,15 @@ OutBuf resb 10
 matr resw 24
 bestQuantity resw 1
 numberOfBest resw 1
+index resd 1
 
     section .text
     global  _start
 _start:
+
+    mov edx, 0
+    mov [index], edx
+
     ;write message
     mov eax, 4
     mov ebx, 1
@@ -86,19 +94,30 @@ skipAdding:
 skipUpdateMax:
     loop loop_i
 
+    jmp printMatrix
+
+returnAfterPrintMatr:
+
+
     jmp printNumberOfBestString
 
 
+
+
 printMatrix:
-    mov ecx, 24
+    mov ecx, 6
     mov ebx, 0
 cycle_write:
     push ecx
     ;convert elem of matr to string
+    mov ecx, 4
+cycle_with_enter:
     mov esi, OutBuf
+    mov ebx, [index]
     mov ax, [matr + ebx]
     add ebx, 2
-    push ebx
+    mov [index], ebx
+    push ecx
     cwde
     call IntToStr
 
@@ -108,10 +127,24 @@ cycle_write:
     mov eax, 4
     mov ebx, 1
     int 80h
+
+
+    pop ecx
+    loop cycle_with_enter
+
+    ;write enter
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, putEnter 
+    mov edx, lenEnter
+    int 80h
     
-    pop ebx
     pop ecx
     loop cycle_write
+;end of print matrix
+    jmp returnAfterPrintMatr
+
+
     
 
 printNumberOfBestString:
@@ -178,4 +211,4 @@ exit:
     xor ebx, ebx
     int 80h
 
-%include "../int_string.asm"
+%include "int_string.asm"
